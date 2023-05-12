@@ -20,7 +20,6 @@ volumes:
 services:
 
 
-
 ######################################################################################
 #####################          PROMETHEUS CONTAINER            #######################
 ######################################################################################
@@ -30,10 +29,6 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
-    #environment:
-    #  VIRTUAL_HOST: ${PROMETHEUS_HOST}
-    #  VIRTUAL_PORT: 9090
-    #  LETSENCRYPT_HOST: ${PROMETHEUS_HOST}
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
@@ -160,7 +155,7 @@ services:
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=${GRAFANA_HOST}
       - GF_INSTALL_PLUGINS=fifemon-graphql-datasource
-      - subgraph_endpoint=${SUBGRAPH_ENDPOINT:-https://gateway.thegraph.com/network}
+      - subgraph_endpoint=${SUBGRAPH_ENDPOINT:-https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet}
     restart: unless-stopped
     expose:
       - 3000

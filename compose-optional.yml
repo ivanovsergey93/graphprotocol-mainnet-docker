@@ -13,8 +13,28 @@ networks:
   net:
     external: true
 
-
 services:
+
+######################################################################################
+#####################           POI RADIO CONTAINER            #######################
+######################################################################################
+
+  poi-radio:
+    image: ghcr.io/graphops/poi-radio:0.2
+    container_name: poi-radio
+    restart: unless-stopped
+    environment:
+      GRAPHCAST_NETWORK: "mainnet"
+      REGISTRY_SUBGRAPH: "https://api.thegraph.com/subgraphs/name/hopeyen/graphcast-registry-mainnet"
+      NETWORK_SUBGRAPH: "https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"
+      #ETH_NODE: "http://${TXN_RPC}:8545"
+      PRIVATE_KEY: "${GRAPHCAST_ID_PRIVATE_KEY}"
+      GRAPH_NODE_STATUS_ENDPOINT: "http://index-node-0:8030/graphql"
+      RUST_LOG: "warn,hyper=warn,graphcast_sdk=info,poi_radio=info"
+      COVERAGE: comprehensive
+    networks:
+      - monitor-net
+    logging: *default-logging
 
 
 ######################################################################################
@@ -22,7 +42,7 @@ services:
 ######################################################################################
 
   poifier:
-    image: grassets/poifier-client:v2.0.2
+    image: grassets/poifier-client:v2.0.3
     container_name: poifier
     command:
       - '--poifier-server=https://poifier.io'
@@ -41,7 +61,7 @@ services:
 ######################################################################################
 
   indexer-agent-gui:
-    image: ${INDEXER_AGENT_GUI:-ghcr.io/stakemachine/indexer-agent-ui:v0.1.9}
+    image: ${INDEXER_AGENT_GUI:-ghcr.io/stakemachine/indexer-agent-ui:v0.1.14}
     container_name: indexer-agent-gui
     expose:
       - 3000
@@ -49,7 +69,7 @@ services:
       - UI_LOGIN=${ADMIN_USER:-test}
       - UI_PASS=${ADMIN_PASSWORD:-pass}
       - AGENT_ENDPOINT=${INDEXER_AGENT_ENDPOINT:-http://indexer-agent:8000}
-      - SUBGRAPH_ENDPOINT=${INDEXER_AGENT_NETWORK_SUBGRAPH_ENDPOINT:-https://gateway.thegraph.com/network}
+      - SUBGRAPH_ENDPOINT=${INDEXER_AGENT_NETWORK_SUBGRAPH_ENDPOINT:-https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=https://${AGENT_GUI_HOST}/
       - VIRTUAL_HOST=${AGENT_GUI_HOST}
